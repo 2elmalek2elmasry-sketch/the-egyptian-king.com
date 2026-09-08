@@ -1,45 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOODIES | MANIFEST DEPLOYMENT</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order — THE EGYPTIAN KING</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fff; --text-main:#0a0a0a; --text-muted:#666; --accent:#bfa15f; --border:#e5e5e5; }
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Inter',sans-serif; }
+body { background:var(--bg); color:var(--text-main); }
+header { background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:1.25rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+.brand-logo { font-family:'Cinzel',serif; font-size:1.4rem; font-weight:900; letter-spacing:2px; color:#0a0a0a; text-decoration:none; text-transform:uppercase; }
+.nav-track-btn { background:transparent; border:1px solid #0a0a0a; color:#0a0a0a; padding:0.5rem 1rem; border-radius:4px; font-weight:700; font-size:0.8rem; text-transform:uppercase; text-decoration:none; transition:all 0.2s; }
+.nav-track-btn:hover { background:#0a0a0a; color:#fff; }
+
+.container { max-width:700px; margin:3rem auto; padding:0 1.5rem; }
+h1 { font-family:'Cinzel',serif; font-size:1.8rem; font-weight:900; margin-bottom:0.5rem; text-align:center; }
+p.subtitle { text-align:center; color:var(--text-muted); font-size:0.9rem; margin-bottom:2rem; }
+
+.search-box-wrapper { background:#fafafa; border:1px solid var(--border); padding:2rem; border-radius:8px; margin-bottom:2rem; }
+.search-box { display:flex; gap:0.5rem; margin-bottom:1rem; }
+.input-field { flex:1; padding:0.9rem 1rem; border:1px solid var(--border); border-radius:4px; font-size:0.9rem; outline:none; background:#fff; }
+.input-field:focus { border-color:#0a0a0a; }
+.btn { padding:0.9rem 1.5rem; background:#0a0a0a; color:#fff; border:none; border-radius:4px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:0.85rem; transition:background 0.2s; }
+.btn:hover { background:#333; }
+
+.forgot-link { background:none; border:none; color:var(--text-muted); font-size:0.8rem; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; }
+.forgot-link:hover { color:#0a0a0a; }
+
+.site-alert { background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:1rem; border-radius:6px; font-size:0.85rem; font-weight:600; text-align:center; margin-bottom:1.5rem; display:none; }
+.site-alert.show { display:block; }
+
+.result-card { background:#fafafa; border:1px solid var(--border); border-radius:8px; padding:2rem; display:none; }
+.result-card.active { display:block; }
+.order-header-info { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:1rem; margin-bottom:1.5rem; }
+.status-badge { padding:6px 12px; border-radius:4px; font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; }
+.status-received { background:#e2e8f0; color:#1e293b; }
+.status-printing { background:#fef3c7; color:#d97706; }
+.status-delayed { background:#fee2e2; color:#dc2626; }
+.status-dispatched { background:#e0f2fe; color:#0284c7; }
+.status-delivered { background:#dcfce7; color:#16a34a; }
+
+/* Moving Delivery Truck Timeline UI */
+.timeline { position:relative; padding-left:2.5rem; margin-top:1.5rem; border-left:3px solid var(--border); }
+.timeline-step { position:relative; margin-bottom:1.8rem; }
+.timeline-step::before { content:''; position:absolute; left:-2.75rem; top:0.2rem; width:14px; height:14px; border-radius:50%; background:#ccc; border:2px solid #fff; z-index:2; transition:all 0.3s; }
+.timeline-step.completed::before { background:#0a0a0a; }
+.timeline-step.active::before { background:#bfa15f; box-shadow:0 0 0 4px rgba(191,161,95,0.2); }
+.timeline-step h4 { font-size:0.95rem; font-weight:700; margin-bottom:0.2rem; }
+.timeline-step p { font-size:0.85rem; color:var(--text-muted); }
+
+/* Animated Delivery Truck Icon */
+.delivery-truck {
+position:absolute; left:-3.25rem; top:0; font-size:1.2rem; z-index:5;
+transition:top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; display:none; justify-content:center; align-items:center; padding:1rem; }
+.modal-content { background:#fff; padding:2rem; border-radius:8px; width:100%; max-width:550px; max-height:90vh; overflow-y:auto; }
+
+.admin-panel-toggle { margin-top:3rem; text-align:center; border-top:1px dashed var(--border); padding-top:1.5rem; }
+.admin-order-row { background:#f9f9f9; border:1px solid var(--border); padding:1rem; border-radius:6px; margin-bottom:0.8rem; }
+</style>
 </head>
 <body>
+<header>
+<a href="index.html" class="brand-logo">The Egyptian King</a>
+<a href="shop.html" class="nav-track-btn">Back to Shop</a>
+</header>
 
-    <nav>
-        <a href="index.html" class="logo">THE EGYPTIAN KING™</a>
-        <div class="nav-links">
-            <a href="index.html">Hub</a>
-            <a href="tshirts.html">T-Shirts</a>
-            <a href="hoodies.html" class="active">Hoodies</a>
-            <a href="zippers.html">Zippers</a>
-        </div>
-        <button class="cart-icon-btn" onclick="window.location.href='checkout.html'">
-            CART [<span class="cart-count">0</span>]
-        </button>
-    </nav>
+<div class="container">
+<h1>Order Tracking</h1>
+<p class="subtitle">Enter your Order ID to monitor live progress.</p>
 
-    <div class="catalog-container">
-        <h2 class="catalog-title">System // Folder: Hoodies</h2>
-        <div class="product-grid">
-            
-            <div class="product-card">
-                <div class="product-image-frame">
-                    <img src="https://i.postimg.cc/rw0MS0qm/Capture-3.jpg" alt="Habib Albi">
-                </div>
-                <div class="product-info">
-                    <span class="product-name">"Habib Albi Magazine" Grey Hoodie</span>
-                    <span class="product-price">EGP 950.00</span>
-                </div>
-                <button class="add-to-cart-btn" onclick="addProductToCart('hd-01', '\"Habib Albi Magazine\" Grey Hoodie', 950, 'https://i.postimg.cc/rw0MS0qm/Capture-3.jpg', 'Heavyweight Drop')">Inject Into Cart</button>
-            </div>
+<div class="search-box-wrapper">
+<div class="site-alert" id="custom-site-alert">U have no orders to track</div>
+<div class="search-box">
+<input type="text" id="order-search-input" class="input-field" placeholder="e.g. #EK-48291">
+<button class="btn" onclick="trackOrder()">Track Order</button>
+</div>
+<div style="text-align:right;">
+<button class="forgot-link" onclick="openForgotModal()">Forgot Order ID?</button>
+</div>
+</div>
 
-        </div>
-    </div>
+<div class="result-card" id="result-card">
+<div class="order-header-info">
+<div>
+<h3 id="res-id" style="font-weight:900; font-size:1.1rem;">#EK-00000</h3>
+<p id="res-date" style="font-size:0.8rem; color:var(--text-muted);">Date: —</p>
+<p id="res-customer" style="font-size:0.8rem; font-weight:600; color:#333; margin-top:2px;"></p>
+</div>
+<div>
+<span id="res-status-badge" class="status-badge status-received">Processing</span>
+</div>
+</div>
 
-    <script src="cart-engine.js"></script>
+<div style="margin-bottom:1.5rem;">
+<p style="font-size:0.85rem; font-weight:700; margin-bottom:0.3rem;">Current Status Message:</p>
+<p id="res-status-desc" style="font-size:0.9rem; color:var(--text-muted);"></p>
+</div>
+
+<h4 style="font-size:0.95rem; font-weight:800; text-transform:uppercase; margin-bottom:1rem; letter-spacing:0.5px;">Milestone Timeline</h4>
+<div class="timeline" id="timeline-container">
+<div class="delivery-truck" id="truck-icon">🚚</div>
+</div>
+</div>
+
+<div class="admin-panel-toggle">
+<p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">Store Owner Control Panel</p>
+<button class="btn" style="background:#bfa15f; font-size:0.75rem; padding:0.5rem 1rem;" onclick="promptAdminPasscode()">Open Owner Dashboard</button>
+</div>
+</div>
+
+<!-- PASSCODE MODAL -->
+<div class="modal-overlay" id="passcode-modal">
+<div class="modal-content" style="max-width:380px; text-align:center;">
+<h3 style="font-size:1.1rem; font-weight:900; margin-bottom:0.5rem;">Owner Passcode Required</h3>
+<p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Enter secure passcode to manage store orders.</p>
+<div style="margin-bottom:1rem;">
+<input type="password" id="passcode-input" class="input-field" placeholder="Enter passcode..." style="text-align:center;">
+</div>
+<div style="display:flex; gap:0.5rem;">
+<button class="btn" style="flex:1;" onclick="verifyPasscode()">Unlock</button>
+<button class="btn" style="background:#ccc; color:#000; flex:1;" onclick="closePasscodeModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- MASTER ADMIN DASHBOARD MODAL -->
+<div class="modal-overlay" id="admin-modal">
+<div class="modal-content">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+<h3 style="font-size:1.2rem; font-weight:900;">Live Order Control Dashboard</h3>
+<button onclick="closeAdminModal()" style="background:none; border:none; font-weight:bold; cursor:pointer; font-size:1.1rem;">✕</button>
+</div>
+<p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1.5rem;">Review all active customer orders and update their statuses in real time.</p>
+<div id="admin-orders-list"></div>
+</div>
+</div>
+
+<!-- FORGOT ORDER ID MODAL -->
+<div class="modal-overlay" id="forgot-modal">
+<div class="modal-content">
+<h3 style="font-size:1.2rem; font-weight:900; margin-bottom:0.5rem;">Find Your Order ID</h3>
+<p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Re-enter your checkout details (Phone, Name, or Email).</p>
+<div style="margin-bottom:1rem;">
+<input type="text" id="forgot-query" class="input-field" placeholder="Enter phone, name, or email..." style="width:100%;">
+</div>
+<div id="forgot-results-list" style="margin-bottom:1rem; max-height:180px; overflow-y:auto;"></div>
+<div style="display:flex; gap:0.5rem;">
+<button class="btn" style="flex:1;" onclick="searchUserOrders()">Search Orders</button>
+<button class="btn" style="background:#ccc; color:#000; flex:1;" onclick="closeForgotModal()">Close</button>
+</div>
+</div>
+</div>
+
+<script>
+function getStoredOrders() {
+return JSON.parse(localStorage.getItem('allStoreOrders')) || [];
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+let lastOrder = JSON.parse(localStorage.getItem('lastCompletedOrder'));
+if(lastOrder) {
+let allOrders = getStoredOrders();
+if(!allOrders.some(o => o.orderId === lastOrder.orderId)) {
+allOrders.unshift({
+orderId: lastOrder.orderId,
+date: lastOrder.date,
+status: 'received',
+note: 'Your order has been registered successfully.',
+customer: lastOrder.customer
+});
+localStorage.setItem('allStoreOrders', JSON.stringify(allOrders));
+}
+}
+});
+
+function showSiteAlert(msg) {
+const alertBox = document.getElementById('custom-site-alert');
+alertBox.innerText = msg;
+alertBox.classList.add('show');
+setTimeout(() => { alertBox.classList.remove('show'); }, 4000);
+}
+
+function trackOrder() {
+const queryId = document.getElementById('order-search-input').value.trim();
+const allOrders = getStoredOrders();
+const resultCard = document.getElementById('result-card');
+
+if (allOrders.length === 0) {
+showSiteAlert("U have no orders to track");
+resultCard.classList.remove('active');
+return;
+}
+
+if (!queryId) {
+showSiteAlert("Please enter an Order ID.");
+return;
+}
+
+const order = allOrders.find(o => o.orderId.toLowerCase() === queryId.toLowerCase());
+
+if(!order) {
+showSiteAlert("U have no orders to track");
+resultCard.classList.remove('active');
+return;
+}
+
+document.getElementById('res-id').innerText = order.orderId;
+document.getElementById('res-date').innerText = `Date: ${order.date}`;
+document.getElementById('res-customer').innerText = `Customer: ${order.customer ? order.customer.name : 'N/A'}`;
+document.getElementById('res-status-desc').innerText = order.note;
+
+const badge = document.getElementById('res-status-badge');
+badge.className = `status-badge status-${order.status}`;
+badge.innerText = order.status.toUpperCase();
+
+const timelineContainer = document.getElementById('timeline-container');
+const stages = [
+{ key: 'received', title: 'Order Registered', desc: 'Payment verified and order logged.' },
+{ key: 'printing', title: 'Apparel Printing & Quality Check', desc: 'Custom calligraffiti press in progress.' },
+{ key: 'delayed', title: 'Status Notice / Hold', desc: 'Paused due to stock adjustments or checks.' },
+{ key: 'dispatched', title: 'Dispatched with Courier', desc: 'Handed over to delivery partner.' },
+{ key: 'delivered', title: 'Delivered', desc: 'Package safely delivered.' }
+];
+
+let stageReached = true;
+let activeStepIndex = 0;
+
+timelineContainer.innerHTML = `<div class="delivery-truck" id="truck-icon">🚚</div>` + stages.map((s, idx) => {
+let isCurrent = (order.status === s.key);
+let cls = '';
+if(isCurrent) { cls = 'active'; activeStepIndex = idx; stageReached = false; }
+else if(stageReached && order.status !== 'delayed') { cls = 'completed'; }
+if(order.status === 'delayed' && s.key === 'delayed') { cls = 'active'; activeStepIndex = idx; }
+
+return `
+<div class="timeline-step ${cls}">
+<h4>${s.title}</h4>
+<p>${s.desc}</p>
+</div>
+`;
+}).join('');
+
+// Position the moving delivery truck precisely next to the active milestone step
+setTimeout(() => {
+const stepElements = timelineContainer.querySelectorAll('.timeline-step');
+if(stepElements[activeStepIndex]) {
+const targetTop = stepElements[activeStepIndex].offsetTop;
+document.getElementById('truck-icon').style.top = `${targetTop}px`;
+}
+}, 50);
+
+resultCard.classList.add('active');
+}
+
+/* Secure Passcode Functions */
+function promptAdminPasscode() {
+document.getElementById('passcode-input').value = '';
+document.getElementById('passcode-modal').style.display = 'flex';
+}
+
+function closePasscodeModal() {
+document.getElementById('passcode-modal').style.display = 'none';
+}
+
+function verifyPasscode() {
+const entered = document.getElementById('passcode-input').value.trim();
+if(entered === "01025002299Abcd") {
+closePasscodeModal();
+openMasterAdminDashboard();
+} else {
+alert("Incorrect passcode!");
+}
+}
+
+/* Master Admin Dashboard */
+function openMasterAdminDashboard() {
+const allOrders = getStoredOrders();
+const container = document.getElementById('admin-orders-list');
+
+if(allOrders.length === 0) {
+container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted);">No orders exist in the system yet.</p>';
+} else {
+container.innerHTML = allOrders.map(o => `
+<div class="admin-order-row">
+<div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+<strong>${o.orderId}</strong>
+<span style="font-size:0.75rem; color:var(--text-muted);">${o.date}</span>
+</div>
+<div style="font-size:0.8rem; color:#444; margin-bottom:0.6rem;">
+Customer: <strong>${o.customer ? o.customer.name : 'N/A'}</strong> (${o.customer ? o.customer.phone : ''})
+</div>
+<div style="display:flex; gap:0.5rem; align-items:center;">
+<select id="status-${o.orderId}" class="input-field" style="padding:0.4rem; font-size:0.8rem;">
+<option value="received" ${o.status==='received'?'selected':''}>1. Registered</option>
+<option value="printing" ${o.status==='printing'?'selected':''}>2. Printing</option>
+<option value="delayed" ${o.status==='delayed'?'selected':''}>⚠️ Delayed / On Hold</option>
+<option value="dispatched" ${o.status==='dispatched'?'selected':''}>3. Dispatched</option>
+<option value="delivered" ${o.status==='delivered'?'selected':''}>4. Delivered</option>
+</select>
+<input type="text" id="note-${o.orderId}" class="input-field" value="${o.note || ''}" placeholder="Custom note..." style="padding:0.4rem; font-size:0.8rem; flex:1;">
+<button class="btn" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="saveSingleOrderUpdate('${o.orderId}')">Save</button>
+</div>
+</div>
+`).join('');
+}
+document.getElementById('admin-modal').style.display = 'flex';
+}
+
+function closeAdminModal() {
+document.getElementById('admin-modal').style.display = 'none';
+}
+
+function saveSingleOrderUpdate(orderId) {
+const newStatus = document.getElementById(`status-${orderId}`).value;
+const customNote = document.getElementById(`note-${orderId}`).value;
+
+let allOrders = getStoredOrders();
+let target = allOrders.find(o => o.orderId === orderId);
+if(target) {
+target.status = newStatus;
+target.note = customNote;
+localStorage.setItem('allStoreOrders', JSON.stringify(allOrders));
+alert(`Order ${orderId} updated successfully!`);
+openMasterAdminDashboard();
+}
+}
+
+/* Forgot Order ID Logic */
+function openForgotModal() {
+const allOrders = getStoredOrders();
+if(allOrders.length === 0) {
+showSiteAlert("U have no orders to track");
+return;
+}
+document.getElementById('forgot-query').value = '';
+document.getElementById('forgot-results-list').innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted);">Type your info above and click search.</p>';
+document.getElementById('forgot-modal').style.display = 'flex';
+}
+
+function closeForgotModal() {
+document.getElementById('forgot-modal').style.display = 'none';
+}
+
+function searchUserOrders() {
+const query = document.getElementById('forgot-query').value.trim().toLowerCase();
+const allOrders = getStoredOrders();
+const listContainer = document.getElementById('forgot-results-list');
+
+if(!query) {
+listContainer.innerHTML = '<p style="font-size:0.8rem; color:red;">Please type something to search.</p>';
+return;
+}
+
+const matches = allOrders.filter(o => {
+const c = o.customer || {};
+return (
+(c.name && c.name.toLowerCase().includes(query)) ||
+(c.phone && c.phone.toLowerCase().includes(query)) ||
+(c.email && c.email.toLowerCase().includes(query)) ||
+o.orderId.toLowerCase().includes(query)
+);
+});
+
+if(matches.length === 0) {
+listContainer.innerHTML = '<p style="font-size:0.8rem; color:red;">No matching orders found.</p>';
+return;
+}
+
+listContainer.innerHTML = matches.map(m => `
+<div style="padding:0.6rem; border:1px solid var(--border); border-radius:4px; margin-bottom:0.4rem; display:flex; justify-content:space-between; align-items:center; background:#fafafa;">
+<div>
+<strong style="font-size:0.85rem;">${m.orderId}</strong>
+<div style="font-size:0.75rem; color:var(--text-muted);">${m.date} — ${m.customer ? m.customer.name : ''}</div>
+</div>
+<button class="btn" style="padding:0.3rem 0.6rem; font-size:0.7rem;" onclick="selectFoundOrder('${m.orderId}')">Select</button>
+</div>
+`).join('');
+}
+
+function selectFoundOrder(orderId) {
+document.getElementById('order-search-input').value = orderId;
+closeForgotModal();
+trackOrder();
+}
+</script>
 </body>
 </html>
